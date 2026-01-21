@@ -159,3 +159,71 @@ A: Use 'key' in dict or dict.get(key) is not None
 Q8: Can dictionaries have duplicate keys?
 A: No, the last value overwrites previous ones with the same key.
 """
+
+# ============================================
+# 7. CONVERTING DATATYPES TO DICTIONARY
+# ============================================
+
+print("\n--- CONVERTING TO DICTIONARY ---")
+
+# From list of tuples
+list_of_tuples = [("name", "John"), ("age", 25), ("city", "NYC")]
+dict_from_tuples = dict(list_of_tuples)
+print("From list of tuples:", dict_from_tuples)
+# Output: From list of tuples: {'name': 'John', 'age': 25, 'city': 'NYC'}
+
+# From two separate lists using zip()
+keys = ["name", "age", "city"]
+values = ["Alice", 30, "Boston"]
+dict_from_zip = dict(zip(keys, values))
+print("From zip():", dict_from_zip)
+# Output: From zip(): {'name': 'Alice', 'age': 30, 'city': 'Boston'}
+
+# From list of lists
+list_of_lists = [["id", 1], ["status", "active"]]
+dict_from_lists = dict(list_of_lists)
+print("From list of lists:", dict_from_lists)
+# Output: From list of lists: {'id': 1, 'status': 'active'}
+
+# ============================================
+# 8. ZIP METHOD EXPLAINED
+# ============================================
+
+print("\n--- ZIP METHOD ---")
+
+# Basic zip - pairs elements from multiple iterables
+list1 = [1, 2, 3]
+list2 = ["a", "b", "c"]
+zipped = list(zip(list1, list2))
+print("Zipped lists:", zipped)
+# Output: Zipped lists: [(1, 'a'), (2, 'b'), (3, 'c')]
+
+# Zip with unequal lengths (stops at shortest)
+list3 = [10, 20, 30, 40]
+list4 = ["x", "y"]
+zipped_unequal = list(zip(list3, list4))
+print("Zip unequal lengths:", zipped_unequal)
+# Output: Zip unequal lengths: [(10, 'x'), (20, 'y')]
+
+# Zip with multiple iterables
+list5 = [1, 2, 3]
+list6 = ["a", "b", "c"]
+list7 = [10, 20, 30]
+zipped_multi = list(zip(list5, list6, list7))
+print("Zip multiple lists:", zipped_multi)
+# Output: Zip multiple lists: [(1, 'a', 10), (2, 'b', 20), (3, 'c', 30)]
+
+# Unzipping using zip
+pairs = [(1, "a"), (2, "b"), (3, "c")]
+numbers, letters = zip(*pairs)
+print("Unzipped numbers:", numbers)
+print("Unzipped letters:", letters)
+# Output: Unzipped numbers: (1, 2, 3)
+# Output: Unzipped letters: ('a', 'b', 'c')
+
+# Practical example: Create dictionary from two lists
+students_names = ["John", "Jane", "Jack"]
+students_scores = [85, 90, 88]
+scores_dict = dict(zip(students_names, students_scores))
+print("Student scores:", scores_dict)
+# Output: Student scores: {'John': 85, 'Jane': 90, 'Jack': 88}
