@@ -1,0 +1,132 @@
+================================================================================
+FUNDAMENTAL NETWORK COMMANDS
+================================================================================
+
+1. PING
+    Purpose: Test connectivity to a host
+    Syntax: ping [hostname/IP]
+    Example: ping google.com
+    Use Case: Verify if a server is reachable
+    Output: Shows response time and packet loss
+
+2. IFCONFIG / IP ADDR
+    Purpose: Display network interface configuration
+    Syntax: ifconfig (older) or ip addr show (newer)
+    Example: ip addr show
+    Use Case: Check IP address, MAC address, interface status
+    Shows: IP, netmask, broadcast address, MAC address
+
+3. NETSTAT / SS
+    Purpose: Display network statistics and connections
+    Syntax: netstat -tuln or ss -tuln
+    Example: ss -tuln | grep LISTEN
+    Use Case: Monitor open ports and active connections
+    Real case: Check if port 80 is being used
+
+4. NSLOOKUP / DIG
+    Purpose: DNS lookup to resolve domain names
+    Syntax: nslookup google.com or dig google.com
+    Example: dig example.com +short
+    Use Case: Troubleshoot DNS issues
+    Real case: Find IP of a website
+
+5. TRACEROUTE
+    Purpose: Trace the path packets take to destination
+    Syntax: traceroute [hostname/IP]
+    Example: traceroute google.com
+    Use Case: Diagnose network latency issues
+    Real case: Identify where connection fails
+
+6. ROUTE
+    Purpose: Display/modify routing table
+    Syntax: route -n or ip route show
+    Example: route add -net 192.168.1.0 netmask 255.255.255.0 gw 192.168.0.1
+    Use Case: Configure network routing
+    Real case: Add static route for VPN
+
+7. ARP
+    Purpose: Display ARP (Address Resolution Protocol) table
+    Syntax: arp -a or ip neigh show
+    Example: arp -a
+    Use Case: Map IP addresses to MAC addresses
+    Real case: Find which device has conflicting IP
+
+8. HOSTNAME
+    Purpose: Display or set system hostname
+    Syntax: hostname or hostnamectl set-hostname newname
+    Example: hostnamectl set-hostname server-01
+    Use Case: Identify system on network
+    Real case: Rename a server for organization
+
+9. CURL / WGET
+    Purpose: Download files or make HTTP requests
+    Syntax: curl [URL] or wget [URL]
+    Example: curl -I https://example.com
+    Use Case: Test API endpoints, download files
+    Real case: Check website availability
+
+10. NETCAT (NC)
+     Purpose: Read/write data across networks
+     Syntax: nc -l -p [port] or nc [host] [port]
+     Example: nc -l -p 9999 (listen) or nc localhost 9999 (connect)
+     Use Case: Port scanning, data transfer, debugging
+     Real case: Test if port is open
+
+11. WHOIS
+     Purpose: Lookup domain registration information
+     Syntax: whois [domain]
+     Example: whois google.com
+     Use Case: Get domain owner details
+     Real case: Find contact info for domain
+
+12. IPTABLES / UMEWALL
+     Purpose: Configure firewall rules
+     Syntax: iptables -A INPUT -p tcp --dport 80 -j ACCEPT
+     Example: ufw allow 22/tcp
+     Use Case: Control incoming/outgoing traffic
+     Real case: Block IP address or specific port
+
+13. TCPDUMP
+     Purpose: Capture and analyze network packets
+     Syntax: tcpdump -i [interface] -n
+     Example: tcpdump -i eth0 -n 'tcp port 80'
+     Use Case: Diagnose network issues, security analysis
+     Real case: Monitor HTTP traffic for debugging
+
+14. WGET / CURL WITH OPTIONS
+     Purpose: Advanced HTTP operations
+     Example: curl -X POST -d "data" https://api.example.com
+     Use Case: Test APIs, automation
+     Real case: Send data to remote server
+
+================================================================================
+PRACTICAL REAL-WORLD SCENARIOS
+================================================================================
+
+SCENARIO 1: Server is unreachable
+- Step 1: ping server-ip
+- Step 2: traceroute server-ip (find where it fails)
+- Step 3: Check firewall: sudo iptables -L
+
+SCENARIO 2: Port already in use
+- Step 1: sudo ss -tuln | grep :8080
+- Step 2: Find process: sudo lsof -i :8080
+- Step 3: Kill if needed: sudo kill -9 [PID]
+
+SCENARIO 3: Website not loading
+- Step 1: ping website.com
+- Step 2: dig website.com (check DNS)
+- Step 3: curl -v https://website.com (check HTTP response)
+
+SCENARIO 4: Slow network performance
+- Step 1: ping -c 10 destination (check latency/loss)
+- Step 2: traceroute destination (identify slow hop)
+- Step 3: tcpdump -i eth0 -n (capture packets)
+
+SCENARIO 5: Configure static IP
+- Step 1: ip addr show (current config)
+- Step 2: sudo nano /etc/network/interfaces
+- Step 3: Add: auto eth0 / iface eth0 inet static / address 192.168.1.10
+- Step 4: sudo systemctl restart networking
+
+================================================================================
