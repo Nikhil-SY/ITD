@@ -1,0 +1,137 @@
+Scalar --> Single values [integer. string, boolean, char]
+Note: Variables are always scalar because it stores only single values
+
+ex: numbers = [1,2,3] here numbers hold single value which is list of integers
+
+
+Collection --> Multiple values [array, list, dict, map]
+
+Array - Homogeneous [In bash 4+ versions]
+List - Heterogeneous
+dict - key values pairs[In other languages but not in bash]
+map - key value pairs [In bash 4+ versions]
+
+
+Environment Variables in Linux
+================================
+
+Definition: Environment variables are dynamic values that affect the behavior of processes and programs running on a system.
+
+Types of Environment Variables:
+1. System Variables (uppercase): PATH, HOME, USER, SHELL, etc.
+2. User Variables (lowercase): custom variables created by users
+
+Viewing Environment Variables:
+- env                          # Display all environment variables
+- printenv                     # Print all or specific variables
+- printenv HOME                # Print specific variable
+- echo $PATH                   # Display PATH variable
+- set                          # Show all shell variables (local + environment)
+
+Creating Environment Variables:
+
+Temporary (Current session only):
+- export VAR_NAME="value"      # Create and export variable
+- export MY_VAR="Hello"        # Example
+- echo $MY_VAR                 # Access variable
+
+Permanent (Persistent across sessions):
+Files that store environment variables:
+1. /etc/environment            # System-wide variables (all users)
+2. /etc/profile                # System-wide login shell variables
+3. /etc/bash.bashrc            # System-wide bash configuration
+4. ~/.bashrc                   # User-specific bash variables
+5. ~/.bash_profile             # User-specific login shell variables
+6. ~/.profile                  # User-specific shell variables
+7. ~/.bash_logout              # Executed on logout
+
+Example - Add permanent variable to ~/.bashrc:
+- nano ~/.bashrc               # Open file
+- Add: export MY_PERMANENT="value"
+- Save and exit
+- source ~/.bashrc             # Reload configuration
+
+Deleting Environment Variables:
+- unset VAR_NAME               # Remove variable from current session
+- unset MY_VAR                 # Example
+
+Special Variables:
+- $PATH        # Directories where system searches for commands
+- $HOME        # User's home directory
+- $USER        # Current username
+- $SHELL       # Default shell
+- $PWD         # Current working directory
+- $?           # Exit status of last command
+
+
+Scenarios for Temporary Variables:
+
+1. Testing commands during development
+    - export DEBUG="true"        # Test debugging mode
+    - export TEST_DB="localhost" # Test database connection
+    - Variables lost after terminal closes
+
+2. Running a one-time task with specific configuration
+    - export API_KEY="temp_key_123"
+    - ./deploy.sh               # Script uses the variable
+    - Session ends, variable is removed
+
+3. Quick shell script execution with environment variables
+    - export JAVA_OPTS="-Xmx1024m"
+    - java -jar application.jar # Runs with specified memory
+    - Variable expires when shell closes
+
+
+Scenarios for Permanent Variables:
+
+1. Application configuration paths
+    - Add to ~/.bashrc: export APP_HOME="/opt/myapp"
+    - Used by scripts every time user logs in
+    - Persists across system reboots
+
+2. Custom development tools
+    - Add to ~/.bashrc: export MAVEN_HOME="/usr/local/maven"
+    - Environment variable available for all terminals
+    - Shared configuration across projects
+
+3. System-wide credentials or settings
+    - Add to /etc/environment: export JAVA_HOME="/usr/lib/jvm/java-11"
+    - Available to all users on the system
+    - Required for applications to function properly across sessions
+
+    ### Making Environment Variables Persistent
+
+    To make environment variables persistent across sessions, you can add them to specific configuration files. Here are some examples:
+
+    1. **User-Specific Variables**:
+        - Open the `~/.bashrc` file:
+          ```bash
+          nano ~/.bashrc
+          ```
+        - Add the following line:
+          ```bash
+          export MY_VAR="my_value"
+          ```
+        - Save and exit, then reload the configuration:
+          ```bash
+          source ~/.bashrc
+          ```
+
+    2. **System-Wide Variables**:
+        - Open the `/etc/environment` file (requires sudo):
+          ```bash
+          sudo nano /etc/environment
+          ```
+        - Add the following line:
+          ```bash
+          MY_GLOBAL_VAR="global_value"
+          ```
+        - Save and exit. This variable will be available to all users.
+
+    ### What `export` Does
+
+    The `export` command is used to set environment variables in the current shell session and make them available to any child processes. When you use `export`, it marks the variable to be exported to the environment of subsequently executed commands. For example:
+    ```bash
+    export MY_VAR="value"
+    ```
+    This command creates the variable `MY_VAR` and makes it available to any script or command run in that session.

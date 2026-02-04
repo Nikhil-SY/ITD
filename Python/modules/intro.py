@@ -53,7 +53,7 @@ print()
 print("Example 5: datetime module")
 current_time = datetime.now()
 print(f"Current time: {current_time}")  # Output: 2024-01-15 10:30:45.123456
-tomorrow = current_time + timedelta(days=1)
+tomorrow = current_time + timedelta(days=1)#timedelta(days=1) represents a duration of one day
 print(f"Tomorrow: {tomorrow}")
 print()
 
@@ -65,13 +65,13 @@ print()
 
 # Example 7: os module
 print("Example 7: os module")
-print(f"Current directory: {os.getcwd()}")
+print(f"Current directory: {os.getcwd()}") # Output: current working directory
 print(f"OS name: {os.name}")  # Output: nt (Windows) or posix (Linux/Mac)
 print()
 
 # Example 8: sys module
 print("Example 8: sys module")
-print(f"Python version: {sys.version}")
+print(f"Python version: {sys.version}") # Output: Python version info
 print(f"Python path: {sys.path[:2]}")  # First 2 paths
 print()
 
