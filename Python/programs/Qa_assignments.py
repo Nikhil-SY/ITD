@@ -1,3 +1,5 @@
+#######################Part 1########################
+
 # Addition of two numbers using lambda function
 a = int(input("Enter first number: "))
 b = int(input("Enter second number: "))
@@ -106,3 +108,173 @@ print(new_list)
 n = int(input("Enter the number: "))
 for i in range(1,n+1):
     print('*' * i)
+
+
+#####################3 part 2########################
+
+#First non-repeating character in a string
+s = input("Enter string: ")
+
+for i in range(len(s)):
+    count = 0
+    for j in range(len(s)):
+        if s[i] == s[j]:
+            count += 1
+    if count == 1:
+        print("First non-repeating character:", s[i])
+        break
+
+#Frequency of each word in a sentence
+sentence = input("Enter sentence: ")
+words = sentence.split()
+
+visited = []
+
+for word in words:
+    if word not in visited:
+        count = 0
+        for w in words:
+            if word == w:
+                count += 1
+        print(word, ":", count)
+        visited.append(word)
+
+#First and second largest number in a list
+n = int(input("Enter number of elements: "))
+arr = []
+
+for i in range(n):
+    arr.append(int(input()))
+
+largest = arr[0]
+second = arr[0]
+
+for num in arr:
+    if num > largest:
+        second = largest
+        largest = num
+    elif num > second and num != largest:
+        second = num
+
+print("Largest:", largest)
+print("Second Largest:", second)
+
+#Check whether a number is prime
+num = int(input("Enter number: "))
+
+if num <= 1:
+    print("Not Prime")
+else:
+    flag = True
+    for i in range(2, num):
+        if num % i == 0:
+            flag = False
+            break
+
+    if flag:
+        print("Prime")
+    else:
+        print("Not Prime")
+
+#Common elements between two lists (without set)
+n1 = int(input("Enter size of list1: "))
+list1 = []
+for i in range(n1):
+    list1.append(int(input()))
+
+n2 = int(input("Enter size of list2: "))
+list2 = []
+for i in range(n2):
+    list2.append(int(input()))
+
+print("Common elements:")
+for i in list1:
+    for j in list2:
+        if i == j:
+            print(i)
+            break
+
+#Reverse words without reversing characters
+sentence = input("Enter sentence: ")
+words = sentence.split()
+
+for i in range(len(words)-1, -1, -1):
+    print(words[i], end=" ")
+
+#Reverse words AND characters
+sentence = input("Enter sentence: ")
+words = sentence.split()
+
+for word in words[::-1]:
+    rev = ""
+    for ch in word:
+        rev = ch + rev
+    print(rev, end=" ")
+
+#Missing number from 1 to n
+n = int(input("Enter n: "))
+arr = []
+
+for i in range(n-1):
+    arr.append(int(input()))
+
+expected_sum = n * (n + 1) // 2
+actual_sum = 0
+
+for i in arr:
+    actual_sum += i
+
+print("Missing number:", expected_sum - actual_sum)
+
+#Balanced parentheses
+s = input("Enter brackets string: ")
+count = 0
+
+for ch in s:
+    if ch == "(":
+        count += 1
+    elif ch == ")":
+        count -= 1
+    if count < 0:
+        break
+
+if count == 0:
+    print("Balanced")
+else:
+    print("Not Balanced")
+
+#Convert list of tuples into dictionary
+n = int(input("Enter number of tuples: "))
+d = {}
+
+for i in range(n):
+    key = input("Key: ")
+    value = input("Value: ")
+    d[key] = value
+
+print(d)
+
+#Longest word in a sentence
+sentence = input("Enter sentence: ")
+words = sentence.split()
+
+longest = words[0]
+
+for word in words:
+    if len(word) > len(longest):
+        longest = word
+
+print("Longest word:", longest)
+
+
+#Smallest word in a sentence
+sentence = input("Enter sentence: ")
+words = sentence.split()
+
+smallest = words[0]
+
+for word in words:
+    if len(word) < len(smallest):
+        smallest = word
+
+print("Smallest word:", smallest)
