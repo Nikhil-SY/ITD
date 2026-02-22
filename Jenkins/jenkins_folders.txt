@@ -323,3 +323,147 @@ If you want, next I can explain:
 * Jenkins master-agent architecture
 
 Tell me what you want next.
+
+###############################
+
+Very good 👌 (core DevOps debugging question)
+
+# 🎯 On Which Location Is Jenkins Installed?
+
+It depends on **how Jenkins was installed**.
+
+Let’s break it clearly.
+
+---
+
+# ✅ 1️⃣ If Installed Using Package Manager (Most Common – Linux)
+
+If installed using:
+
+```bash id="a1x9kz"
+sudo apt install jenkins
+```
+
+or
+
+```bash id="b8q2jd"
+sudo yum install jenkins
+```
+
+Then main locations are:
+
+| Component                     | Location                                  |
+| ----------------------------- | ----------------------------------------- |
+| Jenkins WAR file              | `/usr/share/jenkins/`                     |
+| Configuration files           | `/etc/default/jenkins`                    |
+| systemd service file          | `/usr/lib/systemd/system/jenkins.service` |
+| Jenkins Home (very important) | `/var/lib/jenkins/`                       |
+| Logs                          | `/var/log/jenkins/`                       |
+
+---
+
+# 🔥 Most Important Folder
+
+## 📁 `/var/lib/jenkins/`
+
+This is called **JENKINS_HOME**
+
+It contains:
+
+* Jobs
+* Pipelines
+* Plugins
+* Workspace
+* Credentials
+* Config.xml
+
+If you delete this → you lose Jenkins data.
+
+---
+
+# ✅ 2️⃣ If Running as WAR File Manually
+
+If started like:
+
+```bash id="p7l4qw"
+java -jar jenkins.war
+```
+
+Then:
+
+* `jenkins.war` location = wherever you downloaded it
+* Jenkins home = current directory OR `~/.jenkins/`
+
+Check with:
+
+```bash id="z4y7lm"
+echo $JENKINS_HOME
+```
+
+---
+
+# ✅ 3️⃣ If Running via Docker
+
+If started like:
+
+```bash id="m1c8xn"
+docker run -p 8080:8080 jenkins/jenkins:lts
+```
+
+Then:
+
+* Jenkins inside container
+* Data stored in Docker volume
+
+Check with:
+
+```bash id="n6q5rt"
+docker inspect <container_id>
+```
+
+---
+
+# 🔎 How To Confirm On Your Server
+
+Run:
+
+```bash id="t2k9vh"
+systemctl status jenkins
+```
+
+Look for:
+
+```text id="k4w8zc"
+Loaded: loaded (/usr/lib/systemd/system/jenkins.service; enabled)
+```
+
+Then check:
+
+```bash id="x3p6nb"
+cat /usr/lib/systemd/system/jenkins.service
+```
+
+Look for:
+
+```text id="v9r1jd"
+ExecStart=/usr/bin/java -jar /usr/share/jenkins/jenkins.war
+```
+
+That shows install path.
+
+---
+
+# 🎯 Interview Answer
+
+**Q: Where is Jenkins installed in Linux?**
+
+👉 Application files: `/usr/share/jenkins/`
+👉 Configuration: `/etc/default/jenkins`
+👉 Data (JENKINS_HOME): `/var/lib/jenkins/`
+👉 Service level Logs: `/var/log/jenkins/`
+👉 Build level logs: `/var/lib/jenkins/jobs/<job-name>/builds/<build-number>/log`
+
+
+---
+
+
