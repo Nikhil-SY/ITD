@@ -450,3 +450,7 @@ If someone gains access to etcd in Kubernetes cluster, what happens to your Kube
 This is senior-level security question.
 
 Answer that and I’ll know exactly where you stand.
+
+
+
+
