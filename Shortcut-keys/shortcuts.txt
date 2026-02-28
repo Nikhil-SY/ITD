@@ -9,7 +9,7 @@ In ubuntu :
     Press Enter + Press ~ + Press . --> If screen is console is hung and you can not press Ctrl C also, this will close the connection.
 
 Chrome:
-    Ctrl + Shift T --? To restore closed tab
+    Ctrl + Shift T --> To restore closed tab
 
 In any Editor:
     Select lines and Press tab --> to moves all lines together by 1 tab 
