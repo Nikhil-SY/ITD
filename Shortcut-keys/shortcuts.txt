@@ -1,0 +1,17 @@
+In ubuntu :
+    Ctrl S --> To make console look like stuck
+    Ctrl Q --> To make it interactive
+
+    Ctrl D --> To move out if it is asking any input 
+
+    reset --> if the file is opened in encoding format type rest and press enter even though it is not visible
+
+    Press Enter + Press ~ + Press . --> If screen is console is hung and you can not press Ctrl C also, this will close the connection.
+
+Chrome:
+    Ctrl + Shift T --> To restore closed tab
+
+In any Editor:
+    Select lines and Press tab --> to moves all lines together by 1 tab 
+    Select lines and Press Shift + tab --> to moves all lines together by 1 tab left 
+    Select lines and press Alt and use up down keys to place those lines wherever you want
