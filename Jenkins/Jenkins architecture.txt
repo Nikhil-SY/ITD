@@ -983,3 +983,14 @@ Controller → Assigns Agent → Executor Runs → Pipeline Executes
 
 ---
 
+
+Freestyle jobs are traditional UI-based Jenkins jobs suitable for simple builds, 
+whereas Pipeline jobs are code-based and defined using Jenkinsfile, allowing version control, complex workflows, and CI/CD automation.
+
+Agent types:
+Jenkins supports multiple agent types such as agent any, label-based agents, docker agents, dockerfile agents, node agents, and Kubernetes dynamic agents. Modern DevOps environments primarily use pipeline with dynamic agents for scalability and flexibility.
+
+
+Declarative Pipeline is a structured and opinionated Jenkins pipeline syntax that uses the pipeline {} block and predefined sections like agent, stages, and steps to define CI/CD workflows in a simple and readable format.
+
+Scripted Pipeline is a flexible Jenkins pipeline syntax written using Groovy inside a node {} block, allowing full programming control over the CI/CD workflow.
