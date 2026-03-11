@@ -1,0 +1,693 @@
+Below is a **complete real-world Jenkins Declarative Pipeline example** based on your flow.
+
+We will include:
+
+* `triggers`
+* `checkout`
+* `parallel`
+* `retry`
+* `approval`
+* `Docker build`
+* `push`
+* `Kubernetes deploy`
+* `post actions`
+
+Then I will **explain every block and command line-by-line**.
+
+---
+
+# 1. Complete Jenkins Pipeline (Real DevOps Example)
+
+```groovy
+pipeline {
+
+    agent any
+
+    triggers {
+        pollSCM('H/5 * * * *')
+    }
+
+    environment {
+        APP_NAME = "payment-service"
+        DOCKER_REPO = "nikhilsy/payment-service"
+        SONAR_SERVER = "sonarqube-server"
+    }
+
+    stages {
+
+        stage('Checkout Code') {
+            steps {
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: '*/main']],
+                    userRemoteConfigs: [[
+                        url: 'https://github.com/example/payment-service.git'
+                    ]]
+                ])
+            }
+        }
+
+        stage('Build') {
+            steps {
+                retry(3) {
+                    sh 'mvn clean package'
+                }
+            }
+        }
+
+        stage('Tests and Scan') {
+
+            parallel {
+
+                stage('Unit Tests') {
+                    steps {
+                        sh 'mvn test'
+                    }
+                }
+
+                stage('SonarQube Scan') {
+                    steps {
+                        sh 'mvn sonar:sonar'
+                    }
+                }
+
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh """
+                docker build -t ${DOCKER_REPO}:${BUILD_NUMBER} .
+                """
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                sh """
+                docker push ${DOCKER_REPO}:${BUILD_NUMBER}
+                """
+            }
+        }
+
+        stage('Approval') {
+            steps {
+                input message: "Approve deployment to Kubernetes?"
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                sh """
+                kubectl set image deployment/${APP_NAME} \
+                ${APP_NAME}=${DOCKER_REPO}:${BUILD_NUMBER}
+                """
+            }
+        }
+    }
+
+    post {
+
+        always {
+            echo "Pipeline execution completed"
+        }
+
+        success {
+            echo "Deployment successful"
+        }
+
+        failure {
+            echo "Pipeline failed"
+        }
+    }
+}
+```
+
+---
+
+# 2. Pipeline Flow
+
+```
+Trigger Pipeline
+      ↓
+Checkout Code
+      ↓
+Build (Maven)
+      ↓
+Unit Tests + Sonar Scan (Parallel)
+      ↓
+Build Docker Image
+      ↓
+Push Docker Image
+      ↓
+Manual Approval
+      ↓
+Deploy to Kubernetes
+      ↓
+Post Actions
+```
+
+---
+
+# 3. Explanation of Each Block
+
+---
+
+# 3.1 `pipeline`
+
+Root block of Jenkins pipeline.
+
+```
+pipeline { }
+```
+
+Everything must be inside this block.
+
+---
+
+# 3.2 `agent`
+
+```
+agent any
+```
+
+Meaning:
+
+```
+Run pipeline on any available Jenkins agent
+```
+
+Example agent machines:
+
+```
+agent1 (docker)
+agent2 (maven)
+agent3 (kubernetes)
+```
+
+Jenkins controller assigns a node automatically.
+
+---
+
+# 3.3 `triggers`
+
+```
+triggers {
+    pollSCM('H/5 * * * *')
+}
+```
+
+This tells Jenkins to check Git repo every **5 minutes**.
+
+Cron format:
+
+```
+H/5 * * * *
+```
+
+Meaning:
+
+```
+Every 5 minutes check if Git repo changed
+```
+
+If new commit is detected → pipeline triggers.
+
+---
+
+# 3.4 `environment`
+
+```
+environment {
+    APP_NAME = "payment-service"
+    DOCKER_REPO = "nikhilsy/payment-service"
+}
+```
+
+Defines **environment variables available in entire pipeline**.
+
+Example usage later:
+
+```
+${APP_NAME}
+${DOCKER_REPO}
+```
+
+---
+
+# 4. Stage 1 — Checkout Code
+
+```
+stage('Checkout Code')
+```
+
+Purpose:
+
+```
+Download source code from Git repository
+```
+
+---
+
+### Command
+
+```
+checkout([
+$class: 'GitSCM',
+branches: [[name: '*/main']],
+userRemoteConfigs: [[
+url: 'https://github.com/example/payment-service.git'
+]]
+])
+```
+
+Explanation
+
+| Field             | Meaning            |
+| ----------------- | ------------------ |
+| GitSCM            | Jenkins Git plugin |
+| branches          | branch to checkout |
+| */main            | main branch        |
+| userRemoteConfigs | Git repo URL       |
+
+Flow
+
+```
+GitHub Repo
+     ↓
+Jenkins Workspace
+```
+
+Workspace example:
+
+```
+/var/lib/jenkins/workspace/payment-service
+```
+
+---
+
+# 5. Stage 2 — Build
+
+```
+stage('Build')
+```
+
+Command:
+
+```
+retry(3) {
+sh 'mvn clean package'
+}
+```
+
+Explanation
+
+### `retry(3)`
+
+If build fails Jenkins retries **3 times**.
+
+Example
+
+```
+1st build → fail
+2nd build → fail
+3rd build → success
+```
+
+This helps when failure happens due to:
+
+```
+Network issue
+Maven dependency timeout
+Temporary error
+```
+
+---
+
+### Maven Command
+
+```
+mvn clean package
+```
+
+Meaning
+
+| Command | Purpose          |
+| ------- | ---------------- |
+| clean   | remove old build |
+| package | create JAR/WAR   |
+
+Output
+
+```
+target/payment-service.jar
+```
+
+---
+
+# 6. Stage 3 — Parallel Execution
+
+```
+stage('Tests and Scan')
+```
+
+Inside we run **parallel stages**.
+
+---
+
+### Parallel block
+
+```
+parallel {
+   stage('Unit Tests')
+   stage('SonarQube Scan')
+}
+```
+
+Flow
+
+```
+Build
+   ↓
+ ┌───────────────┬───────────────┐
+Unit Tests    Sonar Scan
+```
+
+Both run **simultaneously**.
+
+---
+
+### Unit Test Command
+
+```
+mvn test
+```
+
+Runs
+
+```
+JUnit tests
+```
+
+Example files:
+
+```
+src/test/java/*
+```
+
+---
+
+### SonarQube Scan
+
+```
+mvn sonar:sonar
+```
+
+Performs
+
+```
+Code quality analysis
+```
+
+Checks:
+
+```
+bugs
+code smell
+security vulnerabilities
+coverage
+```
+
+---
+
+# 7. Stage 4 — Build Docker Image
+
+```
+stage('Build Docker Image')
+```
+
+Command
+
+```
+docker build -t repo:tag .
+```
+
+Pipeline version
+
+```
+docker build -t ${DOCKER_REPO}:${BUILD_NUMBER} .
+```
+
+Example result
+
+```
+nikhilsy/payment-service:23
+```
+
+Where
+
+```
+BUILD_NUMBER = Jenkins build id
+```
+
+Example builds
+
+```
+build 21
+build 22
+build 23
+```
+
+---
+
+# 8. Stage 5 — Push Docker Image
+
+```
+docker push repo:tag
+```
+
+Example
+
+```
+docker push nikhilsy/payment-service:23
+```
+
+Flow
+
+```
+Docker Image
+     ↓
+DockerHub Registry
+```
+
+---
+
+# 9. Stage 6 — Manual Approval
+
+```
+input message: "Approve deployment?"
+```
+
+Pipeline pauses until user clicks:
+
+```
+Proceed
+Abort
+```
+
+Used in production pipelines.
+
+Example
+
+```
+Build
+Test
+Approval
+Production Deploy
+```
+
+---
+
+# 10. Stage 7 — Deploy to Kubernetes
+
+Command
+
+```
+kubectl set image deployment/app
+app=image
+```
+
+Pipeline version
+
+```
+kubectl set image deployment/payment-service \
+payment-service=image
+```
+
+Example
+
+```
+kubectl set image deployment/payment-service \
+payment-service=nikhilsy/payment-service:23
+```
+
+Result
+
+```
+Kubernetes updates container image
+```
+
+Deployment flow
+
+```
+Old Pod → Terminated
+New Pod → Created
+```
+
+---
+
+# 11. Post Actions
+
+```
+post { }
+```
+
+Runs **after pipeline finishes**.
+
+---
+
+### always
+
+```
+always {
+echo "Pipeline execution completed"
+}
+```
+
+Runs every time.
+
+---
+
+### success
+
+Runs when pipeline succeeds.
+
+---
+
+### failure
+
+Runs when pipeline fails.
+
+Example
+
+```
+Send slack notification
+Send email
+Create ticket
+```
+
+---
+
+# 12. Why `retry(3)` Works Without `options`
+
+You asked a **very good question**.
+
+There are **two retry mechanisms in Jenkins**.
+
+---
+
+### 1. Step Retry
+
+```
+retry(3) {
+sh 'mvn clean package'
+}
+```
+
+This is a **pipeline step**.
+
+Meaning:
+
+```
+Retry this block 3 times
+```
+
+This does **not require `options`**.
+
+---
+
+### 2. Pipeline Retry (options block)
+
+```
+options {
+retry(3)
+}
+```
+
+This retries **entire pipeline**.
+
+Example
+
+```
+pipeline fails
+Jenkins reruns entire pipeline
+```
+
+---
+
+# Difference
+
+| Type          | Scope                    |
+| ------------- | ------------------------ |
+| retry step    | retries specific command |
+| options retry | retries full pipeline    |
+
+---
+
+# 13. Real Production CI/CD Architecture
+
+```
+GitHub
+   ↓
+Jenkins Controller
+   ↓
+Jenkins Agent
+   ↓
+Build (Maven)
+   ↓
+Test + Sonar Scan
+   ↓
+Docker Build
+   ↓
+DockerHub
+   ↓
+Kubernetes Cluster
+```
+
+---
+
+# 14. Very Important DevOps Interview Questions
+
+### Q1 Why run tests and scan in parallel?
+
+To **reduce pipeline execution time**.
+
+---
+
+### Q2 Why use BUILD_NUMBER in Docker tag?
+
+Ensures **unique image version for each build**.
+
+---
+
+### Q3 Why use manual approval?
+
+Prevents **automatic production deployment**.
+
+---
+
+### Q4 Why retry Maven build?
+
+Network failures while downloading dependencies.
+
+---
