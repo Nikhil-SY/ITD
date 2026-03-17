@@ -1,0 +1,526 @@
+```markdown
+# IAM (Identity and Access Management)
+
+## Question 1: Explain Everything About IAM
+
+## 1. What is IAM
+
+IAM (Identity and Access Management) is an AWS service used to **securely control access to AWS resources**.
+
+It helps you define:
+
+- **Who can access AWS**
+- **What actions they can perform**
+- **Which resources they can access**
+
+Example:
+
+- Developer → Can launch EC2 instances
+- Admin → Full access to AWS
+- Intern → Read-only access to S3
+
+IAM works using **authentication and authorization**.
+
+Authentication = Who are you  
+Authorization = What are you allowed to do
+
+---
+
+# 2. IAM Components
+
+There are **five main components in IAM**
+
+1. Users  
+2. Groups  
+3. Roles  
+4. Policies  
+5. Identity Providers
+
+---
+
+# 3. IAM User
+
+## Definition
+
+An IAM User represents a **person or application that interacts with AWS**.
+
+Example users:
+
+- DevOps Engineer
+- Developer
+- Application
+
+Each user has **credentials** to access AWS.
+
+Types of credentials:
+
+1. Password → For AWS Console login
+2. Access Key → For CLI / API access
+
+Example user:
+
+```
+
+User: nikhil-devops
+
+```
+
+This user may have permissions like:
+
+- Start EC2
+- Stop EC2
+- Upload to S3
+
+---
+
+# 4. IAM Group
+
+## Definition
+
+A Group is a **collection of IAM users**.
+
+Instead of assigning permissions to each user, you assign permissions to a group.
+
+Example:
+
+Group: Developers
+
+Users inside group:
+
+```
+
+nikhil
+rahul
+arjun
+
+```
+
+Permissions attached to group:
+
+```
+
+EC2 Full Access
+
+```
+
+Now all users in the group automatically get the same permissions.
+
+Benefits:
+
+- Easier permission management
+- Avoid repetitive configurations
+
+Example groups:
+
+- Developers
+- DevOps
+- Admins
+- ReadOnlyUsers
+
+Important:
+
+A user can belong to **multiple groups**.
+
+---
+
+# 5. IAM Policy
+
+## Definition
+
+A Policy is a **JSON document that defines permissions**.
+
+Policies determine:
+
+- Which actions are allowed or denied
+- On which resources
+- Under what conditions
+
+Example policy:
+
+Allow user to list S3 buckets.
+
+```
+
+{
+"Effect": "Allow",
+"Action": "s3:ListBucket",
+"Resource": "*"
+}
+
+```
+
+Key elements in policies:
+
+Effect → Allow or Deny  
+Action → What operation is allowed  
+Resource → Which AWS resource
+
+---
+
+# 6. Types of IAM Policies
+
+## 1. AWS Managed Policies
+
+Policies created and maintained by AWS.
+
+Example:
+
+- AmazonS3FullAccess
+- AmazonEC2FullAccess
+- AdministratorAccess
+
+Benefits:
+
+- Easy to use
+- Automatically updated by AWS
+
+---
+
+## 2. Customer Managed Policies
+
+Policies created by users in their AWS account.
+
+Example:
+
+Custom policy allowing only:
+
+- Start EC2
+- Stop EC2
+
+---
+
+## 3. Inline Policies
+
+Policies directly attached to a single user, group, or role.
+
+Not reusable.
+
+Example:
+
+Policy attached only to user:
+
+```
+
+nikhil
+
+```
+
+---
+
+# 7. IAM Role
+
+## Definition
+
+A Role is an **identity that can be assumed temporarily to gain permissions**.
+
+Roles do not have permanent credentials.
+
+Instead, they provide **temporary security credentials**.
+
+---
+
+## Example 1
+
+EC2 instance accessing S3 bucket.
+
+Without role:
+
+- Access keys must be stored on server (security risk)
+
+With role:
+
+- EC2 instance assumes role
+- Gets temporary credentials
+
+Example role:
+
+```
+
+EC2-S3-Access-Role
+
+```
+
+Permissions:
+
+```
+
+Read from S3
+
+```
+
+---
+
+## Example 2
+
+Lambda accessing DynamoDB.
+
+Lambda assumes a role like:
+
+```
+
+Lambda-DynamoDB-Access
+
+```
+
+---
+
+# 8. IAM Role Use Cases
+
+Common scenarios:
+
+1. EC2 accessing S3
+2. Lambda accessing DynamoDB
+3. Cross-account access
+4. Applications accessing AWS services
+
+---
+
+# 9. IAM Authentication Methods
+
+Users authenticate using:
+
+1. Console password
+2. Access keys
+3. Multi-Factor Authentication (MFA)
+
+---
+
+# 10. Access Keys
+
+Used for **programmatic access**.
+
+Example:
+
+Used with:
+
+- AWS CLI
+- SDK
+- Applications
+
+Access keys contain:
+
+```
+
+Access Key ID
+Secret Access Key
+
+```
+
+Example CLI command:
+
+```
+
+aws s3 ls
+
+```
+
+This command uses access keys to authenticate.
+
+---
+
+# 11. Multi-Factor Authentication (MFA)
+
+MFA adds **extra security layer**.
+
+User must provide:
+
+1. Password
+2. OTP from mobile device
+
+Example:
+
+User login flow:
+
+```
+
+Username
+Password
+OTP
+
+```
+
+Benefits:
+
+- Prevents unauthorized access
+- Protects sensitive operations
+
+---
+
+# 12. Principle of Least Privilege
+
+This means giving **minimum permissions required to perform a task**.
+
+Example:
+
+Instead of:
+
+```
+
+AdministratorAccess
+
+```
+
+Give:
+
+```
+
+EC2StartStopAccess
+
+```
+
+Benefits:
+
+- Improved security
+- Reduced risk
+
+---
+
+# 13. IAM Role vs IAM User
+
+| Feature | IAM User | IAM Role |
+|------|------|------|
+Credentials | Permanent | Temporary |
+Used by | Humans / apps | AWS services |
+Access keys | Yes | No |
+Example | Developer login | EC2 accessing S3 |
+
+---
+
+# 14. IAM Best Practices
+
+1. Never use root account for daily work  
+2. Enable MFA for root user  
+3. Use IAM roles instead of access keys  
+4. Follow least privilege principle  
+5. Rotate access keys regularly  
+6. Use groups for permission management  
+
+---
+
+# 15. Root User
+
+Root user is the **owner of AWS account**.
+
+It has **full access to all AWS services**.
+
+Root user should only be used for:
+
+- Account setup
+- Billing changes
+- Critical account configurations
+
+Best practice:
+
+Enable **MFA for root account**.
+
+---
+
+# 16. Cross Account Access
+
+Sometimes one AWS account needs access to resources in another account.
+
+Example:
+
+Account A → Dev account  
+Account B → Production account
+
+Account A can assume a role in Account B.
+
+Flow:
+
+```
+
+User → Assume Role → Temporary Credentials → Access Resources
+
+```
+
+---
+
+# 17. IAM Policy Evaluation Logic
+
+When a request is made:
+
+AWS checks permissions in this order.
+
+1. Explicit Deny
+2. Explicit Allow
+3. Default Deny
+
+Example:
+
+If a policy contains:
+
+```
+
+Deny s3:DeleteObject
+
+```
+
+Then deletion is always blocked.
+
+Even if another policy allows it.
+
+---
+
+# 18. IAM Use Case Example
+
+Example scenario in company.
+
+Team:
+
+Developers  
+DevOps  
+Security
+
+Permissions:
+
+Developers:
+
+- Read S3
+- Deploy applications
+
+DevOps:
+
+- Manage EC2
+- Manage Auto Scaling
+
+Security team:
+
+- Read logs
+- Audit access
+
+Groups created:
+
+```
+
+Developers
+DevOps
+Security
+
+```
+
+Policies attached accordingly.
+
+---
+
+# Key Interview Points
+
+IAM stands for **Identity and Access Management**
+
+Used to **control access to AWS resources**
+
+Main components:
+
+- Users
+- Groups
+- Roles
+- Policies
+
+Roles provide **temporary credentials**
+
+Policies are written in **JSON**
+
+Follow **Least Privilege Principle**
+
+Root account should **not be used daily**
+```
