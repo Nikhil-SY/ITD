@@ -477,3 +477,225 @@ Duplicates | Possible | Not allowed |
 👉 Use FIFO only when **order is critical**  
 👉 Use Standard for **high performance systems**  
 ```
+
+
+############################### SNS + SQS combined ################################################
+
+# Additional: SNS + SQS Combined Use Case (DETAILED 🔥)
+
+---
+
+## Why Combine SNS and SQS?
+
+👉 SNS alone = Push to multiple systems  
+👉 SQS alone = Queue for processing  
+
+👉 Together = **Scalable + Decoupled + Reliable architecture**
+
+---
+
+## Real-Time Scenario: E-commerce Order System
+
+When an order is placed, multiple services must act:
+
+- Email Service → Send confirmation  
+- Billing Service → Process payment  
+- Shipping Service → Prepare delivery  
+
+---
+
+## Problem Without SNS + SQS
+
+If Order Service directly calls all services:
+
+```
+
+Order Service → Email Service
+→ Billing Service
+→ Shipping Service
+
+```
+
+❌ Tight coupling  
+❌ If one service fails → whole flow fails  
+❌ Not scalable  
+
+---
+
+## Solution Using SNS + SQS
+
+---
+
+## Architecture
+
+```
+
+Order Service (Publisher)
+↓
+SNS Topic
+↓
+┌───────────────┬───────────────┬───────────────┐
+↓               ↓               ↓
+SQS Queue      SQS Queue      SQS Queue
+(Email)        (Billing)      (Shipping)
+↓               ↓               ↓
+Email Service  Billing Service Shipping Service
+
+```
+
+---
+
+## Step-by-Step Flow
+
+### Step 1: Order Placed
+
+Order Service publishes message to SNS:
+
+```
+
+Order ID: 12345
+Status: Created
+
+```
+
+---
+
+### Step 2: SNS Fan-out
+
+SNS sends SAME message to:
+
+- Email Queue  
+- Billing Queue  
+- Shipping Queue  
+
+---
+
+### Step 3: SQS Queues Store Messages
+
+Each queue stores message independently.
+
+👉 Even if one service is down → message is safe  
+
+---
+
+### Step 4: Consumers Process Messages
+
+- Email service reads from Email Queue  
+- Billing service reads from Billing Queue  
+- Shipping service reads from Shipping Queue  
+
+---
+
+## Key Advantages
+
+### 1. Decoupling
+
+Services do not depend on each other  
+
+---
+
+### 2. Fault Tolerance
+
+If Billing fails:
+
+✔ Message stays in queue  
+✔ Retry later  
+
+---
+
+### 3. Scalability
+
+- Increase consumers for heavy load  
+- Each service scales independently  
+
+---
+
+### 4. Reliability
+
+- No message loss  
+- DLQ handles failures  
+
+---
+
+## Important Configuration (VERY IMPORTANT 🔥)
+
+### Subscribe SQS to SNS
+
+Steps:
+
+1. Create SNS Topic  
+2. Create SQS Queue  
+3. Go to SNS → Create Subscription  
+4. Select protocol:
+
+```
+
+Amazon SQS
+
+```
+
+5. Choose SQS queue  
+
+---
+
+### Allow SNS to Send to SQS (Policy REQUIRED 🔥)
+
+👉 Add this policy to SQS queue
+
+```
+
+{
+"Effect": "Allow",
+"Principal": {
+"Service": "sns.amazonaws.com"
+},
+"Action": "sqs:SendMessage",
+"Resource": "arn:aws:sqs:REGION:ACCOUNT-ID:queue-name",
+"Condition": {
+"ArnEquals": {
+"aws:SourceArn": "arn:aws:sns:REGION:ACCOUNT-ID:topic-name"
+}
+}
+}
+
+```
+
+---
+
+## Why This Policy is Needed
+
+👉 By default:
+
+❌ SNS CANNOT send messages to SQS  
+
+👉 This policy allows:
+
+✔ SNS → SQS communication  
+
+---
+
+## Real Interview Explanation (Best Answer 🔥)
+
+👉 “SNS is used for fan-out messaging and SQS is used for decoupling.  
+We combine SNS and SQS to ensure that messages are distributed to multiple services reliably, and each service processes them independently using queues.”
+
+---
+
+## When to Use SNS + SQS
+
+- Microservices architecture  
+- Event-driven systems  
+- Order processing systems  
+- Notification pipelines  
+
+---
+
+## Final Key Point
+
+👉 SNS = Distribution  
+👉 SQS = Storage + Processing  
+
+👉 Together = **Highly scalable event-driven architecture**
+```
+
+---
