@@ -1,0 +1,327 @@
+Got it 👍 Let’s do a **complete, step-by-step + interview-style deep dive on VPC Flow Logs** (same style as Route 53).
+
+---
+
+# 🌐 VPC Flow Logs – Full Explanation
+
+## 🔹 What are VPC Flow Logs?
+
+In **Amazon Web Services**, **VPC Flow Logs** capture **network traffic metadata** (NOT payload) going in and out of:
+
+* VPC
+* Subnet
+* Network Interface (ENI)
+
+📌 Example:
+
+```id="q2mqkg"
+EC2 → Internet → Allowed / Denied traffic logs
+```
+
+---
+
+# 🔹 Why use VPC Flow Logs?
+
+## 🎯 Use Cases:
+
+* Debug connectivity issues
+* Security analysis (detect suspicious traffic)
+* Monitor allowed / denied traffic
+* Compliance & auditing
+
+---
+
+# 🔹 What Flow Logs Capture?
+
+✅ Source IP
+✅ Destination IP
+✅ Port
+✅ Protocol
+✅ Traffic status (ACCEPT / REJECT)
+
+❌ NOT captured:
+
+* Packet data (payload)
+* Content inside packets
+
+---
+
+# 🔹 Where Can You Enable Flow Logs?
+
+| Level                           | Description           |
+| ------------------------------- | --------------------- |
+| VPC                             | All traffic in VPC    |
+| Subnet                          | Specific subnet       |
+| ENI (Elastic Network Interface) | Specific EC2 instance |
+
+---
+
+# 🔹 Flow Logs Architecture
+
+```id="p06bfq"
+Traffic → ENI → Flow Logs → Destination
+                              ↓
+                    CloudWatch Logs / S3
+```
+
+---
+
+# 🔹 Destinations for Flow Logs
+
+## 1️⃣ Amazon CloudWatch Logs
+
+* Real-time monitoring
+* Can create alerts
+
+## 2️⃣ Amazon S3
+
+* Long-term storage
+* Cost-effective
+* Used for analytics
+
+---
+
+# 🔹 Flow Log Record Format
+
+## Default Format:
+
+```id="7e3a7c"
+version account-id interface-id srcaddr dstaddr srcport dstport protocol packets bytes start end action log-status
+```
+
+---
+
+## 🔹 Example Record:
+
+```id="m11h67"
+2 123456789 eni-abc123 10.0.1.5 8.8.8.8 443 443 6 10 840 1678900000 1678900060 ACCEPT OK
+```
+
+---
+
+## 🔹 Field Explanation:
+
+| Field      | Meaning           |
+| ---------- | ----------------- |
+| srcaddr    | Source IP         |
+| dstaddr    | Destination IP    |
+| srcport    | Source port       |
+| dstport    | Destination port  |
+| protocol   | 6 = TCP, 17 = UDP |
+| action     | ACCEPT / REJECT   |
+| log-status | OK / NODATA       |
+
+---
+
+# 🔹 ACCEPT vs REJECT
+
+* **ACCEPT** → Allowed by Security Group / NACL
+* **REJECT** → Blocked by NACL (SG doesn’t log reject)
+
+📌 Important:
+
+* Security Groups = **stateful**
+* NACL = **stateless**
+
+---
+
+# 🔹 Step-by-Step Setup (Hands-On)
+
+---
+
+# 🚀 Scenario
+
+You want to monitor traffic for an EC2 instance.
+
+---
+
+## 🧭 Step 1: Go to VPC
+
+1. Login to AWS Console
+2. Go to **VPC Dashboard**
+3. Click **Flow Logs**
+
+---
+
+## 🔹 Step 2: Create Flow Log
+
+Click **Create Flow Log**
+
+---
+
+## 🔹 Step 3: Configure
+
+### Basic Settings:
+
+* Resource Type: **VPC / Subnet / ENI**
+* Resource ID: Select your VPC
+
+---
+
+### Traffic Type:
+
+* ALL → (Recommended)
+* ACCEPT → Only allowed
+* REJECT → Only blocked
+
+---
+
+### Destination:
+
+Choose:
+
+* **CloudWatch Logs**
+* OR **S3**
+
+---
+
+## 🔹 Step 4: IAM Role
+
+👉 Required for permissions
+
+* Create new IAM role
+* Allow:
+
+  * logs:CreateLogGroup
+  * logs:CreateLogStream
+  * logs:PutLogEvents
+
+---
+
+## 🔹 Step 5: Log Group
+
+If using CloudWatch:
+
+```id="m6e3u3"
+Log Group Name: /vpc/flowlogs
+```
+
+---
+
+## 🔹 Step 6: Create
+
+Click **Create Flow Log**
+
+---
+
+# 🧪 Step 7: Test
+
+Generate traffic:
+
+```bash id="4u9qfs"
+curl google.com
+```
+
+Then check logs in:
+
+* CloudWatch → Log Group
+
+---
+
+# 🔍 Example Debugging Scenario
+
+## ❌ Problem:
+
+EC2 cannot access internet
+
+---
+
+## 🔹 Flow Log shows:
+
+```id="t3m5cu"
+REJECT 10.0.1.5 → 8.8.8.8:443
+```
+
+---
+
+## 🔹 Conclusion:
+
+* NACL is blocking traffic
+
+---
+
+# 🔹 Custom Log Format (Advanced)
+
+You can customize fields:
+
+📌 Example:
+
+```id="m75z8g"
+${srcaddr} ${dstaddr} ${action} ${bytes}
+```
+
+---
+
+# 🔹 Aggregation Interval
+
+* 1 minute (detailed)
+* 10 minutes (default)
+
+---
+
+# 🔹 Pricing
+
+* Charged based on:
+
+  * Data ingestion
+  * Storage (CloudWatch / S3)
+
+---
+
+# 🔹 Limitations
+
+❌ No packet inspection
+❌ Cannot see application data
+❌ Delay in logs (~5 min)
+
+---
+
+# 🔹 Best Practices
+
+✅ Enable at **VPC level** for full visibility
+✅ Use **S3 for long-term storage**
+✅ Use **CloudWatch for alerts**
+✅ Filter logs to reduce cost
+✅ Monitor REJECT traffic closely
+
+---
+
+# 🔹 Real Architecture Example
+
+```id="z94ddf"
+User → Internet → ALB → EC2
+                ↓
+          VPC Flow Logs
+                ↓
+      CloudWatch / S3
+```
+
+---
+
+# 🔥 Interview Points
+
+* Captures metadata, not payload
+* Works at VPC / Subnet / ENI level
+* ACCEPT vs REJECT key difference
+* Used for debugging + security
+* Integrates with CloudWatch & S3
+
+---
+
+# 🔥 Common Interview Questions
+
+1. Why Flow Logs don’t show rejected traffic from Security Groups?
+2. Difference between VPC Flow Logs and CloudTrail?
+3. Can Flow Logs capture packet data?
+4. How to debug connectivity using Flow Logs?
+
+---
+
+# 🧠 Quick Summary
+
+* Logs network traffic in VPC
+* Helps in troubleshooting
+* Stored in CloudWatch or S3
+* Key field → ACCEPT / REJECT
+
+---
