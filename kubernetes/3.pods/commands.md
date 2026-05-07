@@ -332,7 +332,7 @@ kubectl get pods -n dev
 kubectl get pods
 kubectl describe pod <name>
 kubectl logs <name>
-kubectl exec -it <name> -- /bin/bash
+kubectl exec -it <name> -- /bin/bash  #you should open 10250 port which is kubelet port to login in to pod
 kubectl delete pod <name>
 ```
 
@@ -346,10 +346,3 @@ kubectl delete pod <name>
 4. How to debug failing pods?
 
 ---
-
-If you want next:
-👉 **“Deployment commands (rolling update, rollback)”**
-👉 OR
-👉 **“Service commands (networking + exposure)”**
-
-Just tell 👍
