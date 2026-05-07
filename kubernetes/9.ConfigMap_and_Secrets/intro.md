@@ -1,3 +1,6 @@
+Line 284: Important
+
+
 Got it—this is an **important Kubernetes interview topic**, and interviewers expect both **concept + real usage**.
 
 I’ll explain in a **clear flow**:
@@ -277,6 +280,9 @@ If you want next, I can explain:
 ✅ **Real production setup (DevOps perspective)**
 
 ####################################################################################################
+
+
+       --------------------------- Very important ---------------------------------------
 
 Perfect—that’s the right way to learn Kubernetes.
 I’ll give you **FULL YAMLs + explain every field clearly**.
