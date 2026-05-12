@@ -910,3 +910,242 @@ Answer:
 > Because it was used as environment variable instead of volume mount
 
 ---
+
+####################################################################################################
+
+# 1. ConfigMap
+
+Suppose ConfigMap contains 2 files:
+
+```yaml id="f0hx8j"
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: nginx-config
+
+data:
+  nginx.conf: |
+    server {
+      listen 80;
+    }
+
+  other.conf: |
+    worker_processes 2;
+```
+
+---
+
+# 2. Deployment WITHOUT `subPath`
+
+```yaml id="c1q9l7"
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: nginx-deployment
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: nginx
+
+  template:
+    metadata:
+      labels:
+        app: nginx
+
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/nginx/nginx.conf
+
+      volumes:
+      - name: config-volume
+        configMap:
+          name: nginx-config
+```
+
+---
+
+# What Happens Internally
+
+ConfigMap has:
+
+```text id="mn9l39"
+nginx.conf
+other.conf
+```
+
+Kubernetes mounts the ENTIRE ConfigMap volume.
+
+So inside container:
+
+```text id="17ivw1"
+/etc
+└── nginx
+    └── nginx.conf
+        ├── nginx.conf
+        └── other.conf
+```
+
+IMPORTANT:
+
+```text id="m70a6m"
+/etc/nginx/nginx.conf
+```
+
+became a DIRECTORY.
+
+This is usually wrong because nginx expects:
+
+```text id="0myh72"
+/etc/nginx/nginx.conf
+```
+
+to be a FILE.
+
+---
+
+# 3. Deployment WITH `subPath`
+
+```yaml id="7ymsw8"
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: nginx-deployment
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: nginx
+
+  template:
+    metadata:
+      labels:
+        app: nginx
+
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
+
+      volumes:
+      - name: config-volume
+        configMap:
+          name: nginx-config
+```
+
+---
+
+# What Happens Now
+
+Kubernetes mounts ONLY:
+
+```text id="hkr52r"
+nginx.conf
+```
+
+from ConfigMap.
+
+So structure becomes:
+
+```text id="7gq1o4"
+/etc
+└── nginx
+    └── nginx.conf
+```
+
+Now:
+
+* `nginx.conf` is a FILE
+* not a directory
+
+Correct behavior.
+
+---
+
+# Visual Comparison
+
+---
+
+## WITHOUT `subPath`
+
+```text id="z3m0jx"
+ConfigMap
+├── nginx.conf
+└── other.conf
+```
+
+Mounted as:
+
+```text id="4mg7ql"
+/etc/nginx/nginx.conf/
+├── nginx.conf
+└── other.conf
+```
+
+`nginx.conf` becomes directory.
+
+---
+
+## WITH `subPath`
+
+```text id="4epl7q"
+ConfigMap
+├── nginx.conf
+└── other.conf
+```
+
+Mounted as:
+
+```text id="qt6z9e"
+/etc/nginx/nginx.conf
+```
+
+Only single file mounted.
+
+---
+
+# Why Kubernetes Does This
+
+Volumes always mount as directories.
+
+Without `subPath`:
+
+* whole volume mounted
+
+With `subPath`:
+
+* one file selected from volume
+
+---
+
+# Real-World Use Case
+
+Very common for:
+
+* nginx.conf
+* application.properties
+* logback.xml
+* prometheus.yml
+
+---
+
+# Interview Answer
+
+Without `subPath`, Kubernetes mounts the entire ConfigMap volume and treats the mount path as a directory. With `subPath`, Kubernetes mounts only the specified file from the ConfigMap at the exact file path inside the container.
