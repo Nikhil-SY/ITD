@@ -1,0 +1,27 @@
+Step1: Install nginx 
+		sudo apt install -y nginx
+
+Step2: Configure nginx 
+		create a conf file using conf.txt in /etc/nginx/sites-enabled/
+
+Step3: stop nginx	
+		sudo systemctl stop nginx 	
+		sudo systemctl start nginx 
+
+Step4: Map domain A record to http (80) to machine in which app is running 
+
+Step5: Install and create ssl certificate with below commands
+		sudo apt install -y certbot 
+		sudo certbot certonly --standalone -d example.com --staple-ocsp -m info@example.com --agree-tos --noninteractive
+
+Step6: To check nginx config with above certificates 
+		sudo nginx -t 
+
+Step7: Open ports for http and https 
+
+Step8: Start nginx 
+		sudo systemctl start nginx 		
+		sudo systemctl status nginx 
+
+
+
