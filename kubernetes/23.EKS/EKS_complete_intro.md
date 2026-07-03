@@ -219,7 +219,7 @@ Each EC2 instance type has a max pod count based on ENI limits:
 # Formula:
 # Max Pods = (Number of ENIs × (IPs per ENI - 1)) + 2
 
-# m5.large: 3 ENIs × 10 IPs = 30 pods
+# m5.large: 3 ENIs × 10 IPs = 29 pods
 # m5.xlarge: 4 ENIs × 15 IPs = 58 pods
 # m5.4xlarge: 8 ENIs × 30 IPs = 234 pods
 ```
